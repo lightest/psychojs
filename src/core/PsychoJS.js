@@ -8,6 +8,7 @@
  * @license Distributed under the terms of the MIT License
  */
 
+import * as PIXI from "pixi.js-legacy";
 import log4javascript from "log4javascript";
 import { ExperimentHandler } from "../data/ExperimentHandler.js";
 import { MonotonicClock } from "../util/Clock.js";
@@ -176,6 +177,31 @@ export class PsychoJS
 		// hide the initialisation message:
 		const root = document.getElementById("root");
 		root.classList.add("is-ready");
+	}
+
+	runPreflightChecks ()
+	{
+		return () => {
+			// If true, fails wgl context creation if dramatic performance drop detected.
+			// Using this to detect if browsers have hardware acceleration setting turned off.
+			// For PIXI it also means to fall back to 2d canvas renderer automatically.
+			// Details: https://registry.khronos.org/webgl/specs/latest/1.0/#5.2
+			PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = true;
+
+			if (!PIXI.utils.isWebGLSupported())
+			{
+				this._gui.dialog({
+					warning:
+						`It looks like hardware acceleration is turned off in your browser!
+						PsychoJS will switch to software based rendering,
+						which means advanced visual features like gratings and gamma correction will not be available.
+						\nIf you need those, you'll need to turn on hardware acceleration in the browser settings.
+						\nIf you wish to continue as is, press OK.`,
+					onOK: () => {
+					}
+				});
+			}
+		};
 	}
 
 	/**

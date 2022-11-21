@@ -91,7 +91,8 @@ export class Window extends PsychObject
 		this._addAttribute("autoLog", autoLog);
 		this._addAttribute("size", []);
 
-		// setup PIXI:
+		window.PIXI = PIXI;
+
 		this._setupPixi();
 
 		this._frameCount = 0;
