@@ -30,6 +30,8 @@ export class TextInput extends PIXI.Container
 			styles.input,
 		);
 
+		this._boxStyle = styles.box;
+
 		if (styles.box)
 		{
 			this._box_generator = typeof styles.box === "function" ? styles.box : new DefaultBoxGenerator(styles.box);
@@ -224,6 +226,49 @@ export class TextInput extends PIXI.Container
 	{
 		this.focus();
 		this._dom_input.select();
+	}
+
+	setFillColor (fillColorInt)
+	{
+		this._boxStyle.fill = fillColorInt;
+		if (Number.isFinite(fillColorInt))
+		{
+			this._boxStyle.alpha = 1;
+		}
+		else
+		{
+			this._boxStyle.alpha = 0;
+		}
+
+		if (this._box)
+		{
+			let input_bounds = this._getDOMInputBounds();
+			const w = input_bounds.width;
+			const h = input_bounds.height;
+			this._box.clear();
+			this._box.beginFill(this._boxStyle.fill, this._boxStyle.alpha);
+
+			if (this._boxStyle.stroke)
+			{
+				this._box.lineStyle(
+					this._boxStyle.stroke.width ?? 1,
+					this._boxStyle.stroke.color,
+					this._boxStyle.stroke.alpha,
+				);
+			}
+
+			if (this._boxStyle.rounded)
+			{
+				this._box.drawRoundedRect(0, 0, w, h, this._boxStyle.rounded);
+			}
+			else
+			{
+				this._box.drawRect(0, 0, w, h);
+			}
+
+			this._box.endFill();
+			this._box.closePath();
+		}
 	}
 
 	setInputStyle(key, value)

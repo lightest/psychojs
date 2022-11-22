@@ -347,8 +347,12 @@ export class TextBox extends util.mix(VisualStim).with(ColorMixin)
 	setFillColor (fillColor, log = false)
 	{
 		this._setAttribute('fillColor', fillColor, log);
-		this._needUpdate = true;
-		this._needPixiUpdate = true;
+		if (this._pixi)
+		{
+			this._pixi.setFillColor(new Color(this._fillColor).int);
+		}
+		// this._needUpdate = true;
+		// this._needPixiUpdate = true;
 	}
 
 	/**
