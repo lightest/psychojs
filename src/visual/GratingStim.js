@@ -27,6 +27,7 @@ import crossShader from "./shaders/crossShader.frag";
 import radRampShader from "./shaders/radRampShader.frag";
 import raisedCosShader from "./shaders/raisedCosShader.frag";
 import radialStim from "./shaders/radialShader.frag";
+import stripesShader from "./shaders/stripes.frag";
 
 import defaultQuadVertWGL1 from "./shaders/wgl1/defaultQuad.vert";
 import imageShaderWGL1 from "./shaders/wgl1/imageShader.frag";
@@ -42,6 +43,7 @@ import crossShaderWGL1 from "./shaders/wgl1/crossShader.frag";
 import radRampShaderWGL1 from "./shaders/wgl1/radRampShader.frag";
 import raisedCosShaderWGL1 from "./shaders/wgl1/raisedCosShader.frag";
 import radialStimWGL1 from "./shaders/wgl1/radialShader.frag";
+import stripesShaderWGL1 from "./shaders/wgl1/stripes.frag";
 
 /**
  * Grating Stimulus.
@@ -265,6 +267,16 @@ export class GratingStim extends VisualStim
 				uColor: [1., 1., 1.],
 				uAlpha: 1.0
 			}
+		},
+		stripes: {
+			shader: stripesShader,
+			uniforms: {
+				uFreq: 10.0,
+				uAlpha: 1.0,
+				uDevicePixelRatio: 1.0,
+				uMod: 2.0,
+				uThickness: 1.0
+			}
 		}
 	};
 
@@ -385,6 +397,16 @@ export class GratingStim extends VisualStim
 				uPhase: 0.0,
 				uColor: [1., 1., 1.],
 				uAlpha: 1.0
+			}
+		},
+		stripes: {
+			shader: stripesShaderWGL1,
+			uniforms: {
+				uFreq: 10.0,
+				uAlpha: 1.0,
+				uDevicePixelRatio: 1.0,
+				uMod: 2.0,
+				uThickness: 1.0
 			}
 		}
 	};
@@ -645,7 +667,7 @@ export class GratingStim extends VisualStim
 
 	/**
 	 * Generate PIXI.Mesh object based on provided shader function name and uniforms.
-	 * 
+	 *
 	 * @protected
 	 * @param {String} shaderName - name of the shader. Must be one of the SHADERS
 	 * @param {Object} uniforms - a set of uniforms to supply to the shader. Mixed together with default uniform values.
@@ -690,10 +712,10 @@ export class GratingStim extends VisualStim
 
 	/**
 	 * Set phase value for the function.
-	 * 
+	 *
 	 * @param {number} phase - phase value
 	 * @param {boolean} [log= false] - whether of not to log
-	 */ 
+	 */
 	setPhase (phase, log = false) {
 		this._setAttribute("phase", phase, log);
 		if (this._pixi instanceof PIXI.Mesh) {
@@ -703,10 +725,10 @@ export class GratingStim extends VisualStim
 
 	/**
 	 * Set color space value for the grating stimulus.
-	 * 
+	 *
 	 * @param {String} colorSpaceVal - color space value
 	 * @param {boolean} [log= false] - whether of not to log
-	 */ 
+	 */
 	setColorSpace (colorSpaceVal = "RGB", log = false) {
 		let colorSpaceValU = colorSpaceVal.toUpperCase();
 		if (Color.COLOR_SPACE[colorSpaceValU] === undefined) {
@@ -720,10 +742,10 @@ export class GratingStim extends VisualStim
 
 	/**
 	 * Set foreground color value for the grating stimulus.
-	 * 
+	 *
 	 * @param {Color} colorVal - color value, can be String like "red" or "#ff0000" or Number like 0xff0000.
 	 * @param {boolean} [log= false] - whether of not to log
-	 */ 
+	 */
 	setColor (colorVal = "white", log = false) {
 		const colorObj = (colorVal instanceof Color) ? colorVal : new Color(colorVal, Color.COLOR_SPACE[this._colorSpace])
 		this._setAttribute("color", colorObj, log);
@@ -734,10 +756,10 @@ export class GratingStim extends VisualStim
 
 	/**
 	 * Determines how visible the stimulus is relative to background.
-	 * 
+	 *
 	 * @param {number} [opacity=1] opacity - The value should be a single float ranging 1.0 (opaque) to 0.0 (transparent).
 	 * @param {boolean} [log= false] - whether of not to log
-	 */ 
+	 */
 	setOpacity (opacity = 1, log = false) {
 		this._setAttribute("opacity", opacity, log);
 		if (this._pixi instanceof PIXI.Mesh) {
@@ -747,10 +769,10 @@ export class GratingStim extends VisualStim
 
 	/**
 	 * Set spatial frequency value for the function.
-	 * 
+	 *
 	 * @param {number} sf - spatial frequency value
 	 * @param {boolean} [log=false] - whether or not to log
-	 */ 
+	 */
 	setSF (sf, log = false) {
 		this._setAttribute("SF", sf, log);
 		if (this._pixi instanceof PIXI.Mesh) {
@@ -760,10 +782,10 @@ export class GratingStim extends VisualStim
 
 	/**
 	 * Set blend mode of the grating stimulus.
-	 * 
+	 *
 	 * @param {String} blendMode - blend mode, can be one of the following: ["avg", "add", "mul", "screen"].
 	 * @param {boolean} [log=false] - whether or not to log
-	 */ 
+	 */
 	setBlendmode (blendMode = "avg", log = false) {
 		this._setAttribute("blendmode", blendMode, log);
 		if (this._pixi !== undefined) {
@@ -781,10 +803,10 @@ export class GratingStim extends VisualStim
 
 	/**
 	 * Whether to interpolate (linearly) the texture in the stimulus.
-	 * 
+	 *
 	 * @param {boolean} interpolate - interpolate or not.
 	 * @param {boolean} [log=false] - whether or not to log
-	 */ 
+	 */
 	setInterpolate (interpolate = false, log = false) {
 		this._setAttribute("interpolate", interpolate, log);
 		if (this._pixi instanceof PIXI.Mesh && this._pixi.shader.uniforms.uTex instanceof PIXI.Texture) {
@@ -809,6 +831,14 @@ export class GratingStim extends VisualStim
 			const anchorNum = this._anchorTextToNum(this._anchor);
 			this._pixi.pivot.x = (anchorNum[0] - 0.5) * this._pixi.scale.x * this._pixi.width;
 			this._pixi.pivot.y = (anchorNum[1] - 0.5) * this._pixi.scale.y * this._pixi.height;
+		}
+	}
+
+	setUniform(uniformName, uniformVal)
+	{
+		if (this._pixi instanceof PIXI.Mesh)
+		{
+			this._pixi.shader.uniforms[ uniformName ] = uniformVal;
 		}
 	}
 
